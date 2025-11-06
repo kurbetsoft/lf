@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сохранить последний кадр видео</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+      background: #111;
+      color: #fff;
+    }
+    input {
+      margin: 20px;
+    }
+    video {
+      display: none;
+      max-width: 90%;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #1e90ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎥 Сохранить последний кадр видео</h1>
+  <input type="file" id="videoInput" accept="video/*">
+  <br>
+  <button id="saveBtn" disabled>Сохранить последний кадр</button>
+  <video id="video"></video>
+
+  <script>
+    const input = document.getElementById('videoInput');
+    const video = document.getElementById('video');
+    const saveBtn = document.getElementById('saveBtn');
+
+    let videoURL = null;
+
+    input.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (videoURL) URL.revokeObjectURL(videoURL);
+      videoURL = URL.createObjectURL(file);
+      video.src = videoURL;
+      video.load();
+
+      saveBtn.disabled = false;
+    });
+
+    saveBtn.addEventListener('click', async () => {
+      try {
+        // Загружаем метаданные (чтобы знать длину)
+        await video.play();
+        video.pause();
+
+        video.currentTime = video.duration - 0.05; // немного меньше конца
+        video.addEventListener('seeked', () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          canvas.toBlob(blob => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'last_frame.png';
+            a.click();
+          }, 'image/png');
+        }, { once: true });
+      } catch (err) {
+        alert('Ошибка: ' + err.message);
+      }
+    });
+  </script>
+</body>
+</html>

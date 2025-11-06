@@ -1,6 +1,6 @@
 {
   "name": "Сохранить последний кадр видео",
-  "short_name": "FrameSaver",
+  "short_name": "Last Frame",
   "description": "Сохраняет последний кадр видео в PNG",
   "start_url": "./index.html",
   "display": "standalone",

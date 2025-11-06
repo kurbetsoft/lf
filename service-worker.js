@@ -1,4 +1,4 @@
-const CACHE_NAME = 'frame-saver-v1';
+const CACHE_NAME = 'frame-saver-v2';
 const FILES_TO_CACHE = [
   './',
   './index.html',

@@ -4,15 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Сохранить последний кадр видео</title>
-
-  <!-- 🧩 PWA META -->
-  <meta name="theme-color" content="#111">
-  <meta name="description" content="Приложение для сохранения последнего кадра видео в PNG">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
   <style>
     body {
       font-family: sans-serif;
@@ -58,13 +49,10 @@
     const saveBtn = document.getElementById('saveBtn');
 
     let videoURL = null;
-    let fileName = 'last_frame.png';
 
     input.addEventListener('change', e => {
       const file = e.target.files[0];
       if (!file) return;
-
-      fileName = file.name.replace(/\.[^/.]+$/, '') + '.png';
 
       if (videoURL) URL.revokeObjectURL(videoURL);
       videoURL = URL.createObjectURL(file);
@@ -76,10 +64,11 @@
 
     saveBtn.addEventListener('click', async () => {
       try {
+        // Загружаем метаданные (чтобы знать длину)
         await video.play();
         video.pause();
 
-        video.currentTime = video.duration - 0.05;
+        video.currentTime = video.duration - 0.05; // немного меньше конца
         video.addEventListener('seeked', () => {
           const canvas = document.createElement('canvas');
           canvas.width = video.videoWidth;
@@ -91,7 +80,7 @@
           canvas.toBlob(blob => {
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = fileName;
+            a.download = 'last_frame.png';
             a.click();
           }, 'image/png');
         }, { once: true });
@@ -99,15 +88,6 @@
         alert('Ошибка: ' + err.message);
       }
     });
-
-    // 🔧 Регистрация service worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .then(() => console.log('✅ Service Worker зарегистрирован'))
-          .catch(err => console.error('❌ Ошибка SW:', err));
-      });
-    }
   </script>
 </body>
 </html>

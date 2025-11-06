@@ -1,1 +1,1 @@
-Save the last frame of the video
+Save the last frame of the video.
